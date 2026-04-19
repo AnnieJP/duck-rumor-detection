@@ -247,7 +247,9 @@ def process_story(story_id, tree_path, source_text, label_int):
         'rootindex':    np.int64(0),
         'topindex':     top_index,
         'triIndex':     tri_index,
-        'source_time':  np.float32(times[0]),  # for chronological splitting
+        # Snowflake IDs are time-ordered; use as absolute chronological key.
+        # times[0] is always 0.0 (relative thread time), not usable for sorting.
+        'source_time':  np.float64(story_id),
     }
 
 
