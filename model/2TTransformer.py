@@ -28,7 +28,7 @@ class PositionalEncoding(nn.Module):
 
 
 
-class 2TTransformerModel(nn.Module):
+class TwoTTransformerModel(nn.Module):
 
     def __init__(self, ntoken: int, d_model: int, nhead: int, d_hid: int,
                  nlayers: int, dropout: float = 0.5):

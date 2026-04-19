@@ -1,7 +1,13 @@
+import importlib
+import torch.nn as nn
+import torch.nn.functional as F
+import torch
 from transformers import BertModel
 from gat import SimpleGAT
-from 2TTransformer import 2TTransformerModel
 from bert_gat import SimpleGAT_BERT
+
+_2tt_module = importlib.import_module("2TTransformer")
+TwoTTransformerModel = _2tt_module.TwoTTransformerModel
 # Create the BertClassfier class
 class BertClassifier(nn.Module):
     """Bert Model for Classification Tasks.
@@ -58,7 +64,7 @@ class ComboNet(nn.Module):
         super(ComboNet, self).__init__()
         D_in, H, D_out = 768,64,4
         #self.bert_seq = BertClassifier(freeze_bert=False)
-        self.bert_tt = 2TTransformerModel()
+        self.bert_tt = TwoTTransformerModel()
         self.user_gat = SimpleGAT(user_in, user_hid, user_out)
         self.bert_gat = SimpleGAT_BERT(in_feats,hid_feats,out_feats)
         #self.gnn = SimpleTDrumorGCN_ROOT(in_feats, hid_feats, out_feats)
