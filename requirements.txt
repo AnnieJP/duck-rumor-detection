@@ -1,0 +1,14 @@
+torch
+torchvision
+torch-scatter
+torch-sparse
+torch-geometric
+transformers
+scikit-learn
+tqdm
+numpy
+pandas
+matplotlib>=3.6
+networkx>=2.8
+scipy>=1.9
+pyro-ppl>=1.8
