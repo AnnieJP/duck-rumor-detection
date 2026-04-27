@@ -26,6 +26,7 @@ Usage:
 import os
 import re
 import ast
+import json
 import argparse
 import pickle
 import random
@@ -65,7 +66,7 @@ def parse_tree_file(filepath):
     return edges
 
 
-def build_graph(edges, source_text, source_id):
+def build_graph(edges, source_text, source_id, tweet_texts=None):
     """
     Convert raw edge list into indexed graph arrays.
 
@@ -74,12 +75,11 @@ def build_graph(edges, source_text, source_id):
         uid_map      : tweet_id -> user_id
         time_map     : tweet_id -> time delay (minutes)
         edge_list    : list of (parent_idx, child_idx)
-        node_content : list of str (empty unless we have text)
+        node_content : list of str (empty unless rehydrated text available)
     """
-    # Collect all unique tweet nodes (skip ROOT)
-    uid_map  = {}   # tweet_id -> user_id
-    time_map = {}   # tweet_id -> float time delay
-    parent_map = defaultdict(list)  # parent_tweet_id -> [child_tweet_id]
+    uid_map  = {}
+    time_map = {}
+    parent_map = defaultdict(list)
 
     for parent, child in edges:
         p_uid, p_tid, p_time = parent
@@ -126,6 +126,8 @@ def build_graph(edges, source_text, source_id):
     for tid in node_order:
         if tid == source_id:
             node_content.append(source_text)
+        elif tweet_texts and tid in tweet_texts:
+            node_content.append(tweet_texts[tid])
         else:
             node_content.append('')
 
@@ -189,14 +191,15 @@ def compute_temporal_features(node_order, time_map, edge_list, source_id):
     return edge_features
 
 
-def process_story(story_id, tree_path, source_text, label_int):
+def process_story(story_id, tree_path, source_text, label_int,
+                  tweet_texts=None, user_features=None):
     """Convert one story into the dict that will be saved as .npz."""
     edges = parse_tree_file(tree_path)
     if not edges:
         return None
 
     node_order, uid_map, time_map, edge_list, node_content = build_graph(
-        edges, source_text, story_id)
+        edges, source_text, story_id, tweet_texts=tweet_texts)
 
     n = len(node_order)
     if n < 2 or not edge_list:
@@ -230,9 +233,13 @@ def process_story(story_id, tree_path, source_text, label_int):
     edge_feat_array = np.array([edge_features.get((pi, ci), np.zeros(6))
                                  for pi, ci in edge_list], dtype=np.float32)
 
-    # user features: 6-dim zero vector (real user features require Twitter API)
-    # shape (N, 6) — filled with zeros since we don't have API access
+    # user features: 6-dim vector per node — populated from rehydrated data if available
     user_x = np.zeros((n, 6), dtype=np.float32)
+    if user_features:
+        for i, tid in enumerate(node_order):
+            uid = uid_map.get(tid, '')
+            if uid and uid in user_features:
+                user_x[i] = np.array(user_features[uid], dtype=np.float32)
 
     return {
         'edgematrix':   edge_array,           # (2, E)
@@ -281,6 +288,31 @@ def load_source_tweets(source_path):
     return source_map
 
 
+def load_rehydrated(data_root):
+    """Load rehydrated tweet texts and user features if available."""
+    tweet_texts_path  = os.path.join(data_root, 'tweet_texts.json')
+    user_features_path = os.path.join(data_root, 'user_features.json')
+
+    tweet_texts = None
+    user_features = None
+
+    if os.path.exists(tweet_texts_path):
+        with open(tweet_texts_path, 'r', encoding='utf-8') as f:
+            tweet_texts = json.load(f)
+        print(f"  Loaded {len(tweet_texts)} rehydrated tweet texts.")
+    else:
+        print("  No tweet_texts.json found — reply node content will be empty.")
+
+    if os.path.exists(user_features_path):
+        with open(user_features_path, 'r', encoding='utf-8') as f:
+            user_features = json.load(f)
+        print(f"  Loaded {len(user_features)} rehydrated user feature vectors.")
+    else:
+        print("  No user_features.json found — userx will be zeros.")
+
+    return tweet_texts, user_features
+
+
 def process_dataset(dataset_name, data_root, out_root):
     dataset_dir = os.path.join(data_root, dataset_name)
     tree_dir    = os.path.join(dataset_dir, 'tree')
@@ -292,6 +324,7 @@ def process_dataset(dataset_name, data_root, out_root):
 
     labels  = load_labels(label_path)
     sources = load_source_tweets(source_path)
+    tweet_texts, user_features = load_rehydrated(data_root)
 
     story_ids = []
     skipped   = 0
@@ -310,7 +343,8 @@ def process_dataset(dataset_name, data_root, out_root):
         source_text = sources.get(story_id, '')
         tree_path   = os.path.join(tree_dir, fname)
 
-        result = process_story(story_id, tree_path, source_text, label_int)
+        result = process_story(story_id, tree_path, source_text, label_int,
+                               tweet_texts=tweet_texts, user_features=user_features)
         if result is None:
             skipped += 1
             continue
