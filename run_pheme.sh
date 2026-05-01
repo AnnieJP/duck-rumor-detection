@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 # SLURM job array for DUCK+ PHEME experiments on Juno HPC.
 #
 # Submits 40 jobs: 4 variants x 2 splits x (9 LOEO events + 1 chrono) = 40
@@ -82,22 +83,33 @@ echo "Task $TASK_ID: variant=$VARIANT split=$SPLIT event=$EVENT fold=$FOLD"
 
 # ── Environment ──────────────────────────────────────────────────────────────
 module load miniconda
+source ~/.bashrc
 conda activate duck
 
 cd "$WORK_DIR"
 
 # ── Copy data to scratch for faster IO ───────────────────────────────────────
 echo "Copying data to scratch..."
-cp -r data/pheme_npz   "$SCRATCH_DIR/"
-cp -r data/pheme_loeo  "$SCRATCH_DIR/"
+cp -r data/pheme_npz    "$SCRATCH_DIR/"
+cp -r data/pheme_loeo   "$SCRATCH_DIR/"
 cp -r data/pheme_chrono "$SCRATCH_DIR/"
 
-# ── Run ──────────────────────────────────────────────────────────────────────
+# ── Run one (variant, split, fold) per array task ────────────────────────────
+if [ "$SPLIT" = "loeo" ]; then
+    STAGE=realistic
+else
+    STAGE=chrono
+fi
+
 python duck_plus_pheme.py \
-    --stage     full \
+    --stage     "$STAGE" \
+    --variant   "$VARIANT" \
+    --fold      "$FOLD" \
     --data-root "$SCRATCH_DIR" \
+    --batch-size 32 \
     --gpu       0
 
-# ── Clean up scratch ─────────────────────────────────────────────────────────
+# ── Copy results back and clean up scratch ───────────────────────────────────
+cp -r "$SCRATCH_DIR"/results/* "$WORK_DIR/results/" 2>/dev/null || true
 echo "Cleaning scratch..."
 rm -rf "$SCRATCH_DIR"

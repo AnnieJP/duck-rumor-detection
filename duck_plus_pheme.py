@@ -40,6 +40,16 @@ from train_duck_plus import set_seed, EarlyStopping, evaluate
 # Config
 # ---------------------------------------------------------------------------
 
+HID_FEATS    = 64
+CT_OUT       = 64
+UT_OUT       = 64
+LR_BERT      = 2e-5
+LR_OTHER     = 1e-3
+WEIGHT_DECAY = 5e-5
+PATIENCE     = 10
+NUM_WORKERS  = 4
+BATCH_SIZE   = 16
+
 LOEO_EVENTS = [
     'charliehebdo', 'ebola-essien', 'ferguson', 'germanwings-crash',
     'gurlitt', 'ottawashooting', 'prince-toronto', 'putinmissing', 'sydneysiege'
@@ -104,16 +114,6 @@ PHEME_RESULT_COLS = [
     'f1_NR', 'f1_FR', 'f1_TR', 'f1_UR',
     'val_f1', 'val_acc',
 ]
-
-HID_FEATS    = 64
-CT_OUT       = 64
-UT_OUT       = 64
-LR_BERT      = 2e-5
-LR_OTHER     = 1e-3
-WEIGHT_DECAY = 5e-5
-PATIENCE     = 10
-NUM_WORKERS  = 4
-BATCH_SIZE   = 16
 
 
 # ---------------------------------------------------------------------------

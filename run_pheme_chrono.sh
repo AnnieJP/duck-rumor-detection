@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 # SLURM job array for DUCK+ PHEME — chrono split (4 variants x 1 run = 4 jobs)
 #
 # Usage:
@@ -13,7 +14,7 @@
 #SBATCH --error=logs/pheme_chrono_%A_%a.err
 #SBATCH --array=0-3
 #SBATCH --time=2-00:00:00
-#SBATCH --partition=h100
+#SBATCH --partition=h100,a30
 #SBATCH --gres=gpu:1
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -32,9 +33,19 @@ mkdir -p "$SCRATCH_DIR"
 echo "Task $SLURM_ARRAY_TASK_ID: variant=$VARIANT split=chrono"
 
 module load miniconda
+source ~/.bashrc
 conda activate duck
 
 cd "$WORK_DIR"
+
+# Detect GPU and set batch size accordingly
+GPU_NAME=$(nvidia-smi --query-gpu=name --format=csv,noheader | head -1)
+if echo "$GPU_NAME" | grep -q "A30"; then
+    BATCH_SIZE=16
+else
+    BATCH_SIZE=32
+fi
+echo "GPU: $GPU_NAME — batch size: $BATCH_SIZE"
 
 # Copy data to scratch for faster IO
 cp -r data/pheme_npz    "$SCRATCH_DIR/"
@@ -44,7 +55,7 @@ python duck_plus_pheme.py \
     --stage      chrono \
     --variant    "$VARIANT" \
     --data-root  "$SCRATCH_DIR" \
-    --batch-size 32 \
+    --batch-size "$BATCH_SIZE" \
     --gpu        0
 
 # Copy results back and clean up
