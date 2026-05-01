@@ -41,10 +41,11 @@ cp -r data/pheme_npz    "$SCRATCH_DIR/"
 cp -r data/pheme_chrono "$SCRATCH_DIR/"
 
 python duck_plus_pheme.py \
-    --stage     chrono \
-    --variant   "$VARIANT" \
-    --data-root "$SCRATCH_DIR" \
-    --gpu       0
+    --stage      chrono \
+    --variant    "$VARIANT" \
+    --data-root  "$SCRATCH_DIR" \
+    --batch-size 32 \
+    --gpu        0
 
 # Copy results back and clean up
 cp -r "$SCRATCH_DIR"/results/* "$WORK_DIR/results/" 2>/dev/null || true

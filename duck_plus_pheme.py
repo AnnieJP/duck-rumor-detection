@@ -170,11 +170,15 @@ def main():
                         default=None, help='Run only this variant (overrides stage)')
     parser.add_argument('--fold', type=int, default=None,
                         help='Run only this fold index (overrides stage)')
+    parser.add_argument('--batch-size', type=int, default=None,
+                        help='Override batch size from preset (e.g. 32 for H100, 16 for A30)')
     args = parser.parse_args()
 
     cfg = PRESETS[args.stage]
+    if args.batch_size is not None:
+        cfg['batch_size'] = args.batch_size
     device = torch.device(f'cuda:{args.gpu}' if torch.cuda.is_available() else 'cpu')
-    print(f'Stage: {args.stage} | Device: {device}')
+    print(f'Stage: {args.stage} | Device: {device} | Batch size: {cfg["batch_size"]}')
 
     npz_dir  = os.path.join(args.data_root, 'pheme_npz')
     ckpt_dir = cfg['ckpt_dir']
