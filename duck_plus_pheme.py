@@ -66,6 +66,16 @@ PRESETS = {
         'result_csv': 'results/pheme_chrono.csv',
         'ckpt_dir': 'checkpoints/pheme_chrono',
     },
+    'random5fold': {
+        'variants': ['baseline', 'temp', 'gated', 'full'],
+        'splits': ['random5fold'],
+        'loeo_events': [],
+        'n_epochs': 50,
+        'batch_size': 8,
+        'smoke_n': None,
+        'result_csv': 'results/pheme_random5fold.csv',
+        'ckpt_dir': 'checkpoints/pheme_random5fold',
+    },
     'realistic': {
         'variants': ['full'],
         'splits': ['loeo', 'chrono'],
@@ -119,7 +129,7 @@ def append_result(result, csv_path):
         writer.writerow({k: result.get(k, '') for k in PHEME_RESULT_COLS})
 
 
-def load_splits(split, event, data_root):
+def load_splits(split, event, data_root, fold=0):
     if split == 'loeo':
         fold_dir = os.path.join(data_root, 'pheme_loeo', f'event_{event}')
         with open(os.path.join(fold_dir, 'train.pkl'), 'rb') as f:
@@ -127,6 +137,13 @@ def load_splits(split, event, data_root):
         with open(os.path.join(fold_dir, 'test.pkl'), 'rb') as f:
             test_ids = pickle.load(f)
         val_ids = test_ids
+    elif split == 'random5fold':
+        fold_dir = os.path.join(data_root, 'pheme_5fold', f'fold{fold}')
+        with open(os.path.join(fold_dir, '_x_train.pkl'), 'rb') as f:
+            train_ids = pickle.load(f)
+        with open(os.path.join(fold_dir, '_x_test.pkl'), 'rb') as f:
+            test_ids = pickle.load(f)
+        val_ids = test_ids   # same protocol as original DUCK
     else:
         chrono_dir = os.path.join(data_root, 'pheme_chrono')
         with open(os.path.join(chrono_dir, 'train.pkl'), 'rb') as f:
@@ -166,6 +183,9 @@ def main():
             if split == 'loeo':
                 for i, event in enumerate(cfg['loeo_events']):
                     jobs.append((variant, split, i, event))
+            elif split == 'random5fold':
+                for fold_idx in range(5):
+                    jobs.append((variant, split, fold_idx, None))
             else:
                 jobs.append((variant, split, 0, None))
 
@@ -195,7 +215,7 @@ def main():
 
         set_seed(42 + fold)
 
-        train_ids, val_ids, test_ids = load_splits(split, event, args.data_root)
+        train_ids, val_ids, test_ids = load_splits(split, event, args.data_root, fold=fold)
 
         if cfg['smoke_n'] is not None:
             train_ids = train_ids[:cfg['smoke_n']]

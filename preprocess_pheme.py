@@ -411,6 +411,34 @@ def make_loeo_splits(story_ids, story_events, out_dir):
         print(f"  LOEO {test_event}: {len(train)} train, {len(test)} test")
 
 
+def make_5fold_splits(story_ids, out_dir, seed=42):
+    """Random 5-fold CV — same protocol as original DUCK on Twitter15/16."""
+    import random as _random
+    os.makedirs(out_dir, exist_ok=True)
+    ids = story_ids.copy()
+    rng = _random.Random(seed)
+    rng.shuffle(ids)
+
+    n = len(ids)
+    fold_size = n // 5
+    folds = []
+    for i in range(5):
+        start = i * fold_size
+        end   = start + fold_size if i < 4 else n
+        folds.append(ids[start:end])
+
+    for fold_idx in range(5):
+        fold_dir = os.path.join(out_dir, f'fold{fold_idx}')
+        os.makedirs(fold_dir, exist_ok=True)
+        test  = folds[fold_idx]
+        train = [sid for j, f in enumerate(folds) if j != fold_idx for sid in f]
+        with open(os.path.join(fold_dir, '_x_train.pkl'), 'wb') as f:
+            pickle.dump(train, f)
+        with open(os.path.join(fold_dir, '_x_test.pkl'), 'wb') as f:
+            pickle.dump(test, f)
+        print(f"  Fold {fold_idx}: {len(train)} train, {len(test)} test")
+
+
 def make_chrono_splits(story_ids, npz_dir, out_dir):
     """Chronological 60/20/20 split by source tweet timestamp."""
     os.makedirs(out_dir, exist_ok=True)
@@ -456,6 +484,10 @@ def run(pheme_root, out_root='data'):
     print("Creating chronological splits...")
     make_chrono_splits(story_ids, npz_dir,
                        os.path.join(out_root, 'pheme_chrono'))
+
+    print("Creating random 5-fold splits...")
+    make_5fold_splits(story_ids,
+                      os.path.join(out_root, 'pheme_5fold'))
 
     print(f"Done. {len(story_ids)} threads ready in {npz_dir}")
     return story_ids
