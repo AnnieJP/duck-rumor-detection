@@ -1,10 +1,25 @@
 # Juno Run Steps — chrono + random5fold
 
-Exact commands to run after `ssh <netid>@juno.utdallas.edu`.
+---
+
+## Step 0 — Upload data (run from your Mac terminal, NOT Juno)
+
+One-time only. The PHEME data folders are not in git, so they must be copied
+manually. Total size is ~58 MB. Replace `<netid>` with your UTD NetID.
+
+```bash
+cd ~/Projects/duck-rumor-detection
+scp -r data/pheme_npz    <netid>@juno.utdallas.edu:~/work/duck-rumor-detection/data/
+scp -r data/pheme_chrono <netid>@juno.utdallas.edu:~/work/duck-rumor-detection/data/
+scp -r data/pheme_5fold  <netid>@juno.utdallas.edu:~/work/duck-rumor-detection/data/
+scp -r data/pheme_loeo   <netid>@juno.utdallas.edu:~/work/duck-rumor-detection/data/
+```
+
+Then ssh into Juno: `ssh <netid>@juno.utdallas.edu`
 
 ---
 
-## First-time setup (steps 1–7)
+## First-time setup on Juno (steps 1–7)
 
 ```bash
 # 1. Pull latest code
