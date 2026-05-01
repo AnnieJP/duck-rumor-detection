@@ -61,7 +61,7 @@ PRESETS = {
         'splits': ['chrono'],
         'loeo_events': [],
         'n_epochs': 50,
-        'batch_size': 8,
+        'batch_size': BATCH_SIZE,
         'smoke_n': None,
         'result_csv': 'results/pheme_chrono.csv',
         'ckpt_dir': 'checkpoints/pheme_chrono',
@@ -71,7 +71,7 @@ PRESETS = {
         'splits': ['random5fold'],
         'loeo_events': [],
         'n_epochs': 50,
-        'batch_size': 8,
+        'batch_size': BATCH_SIZE,
         'smoke_n': None,
         'result_csv': 'results/pheme_random5fold.csv',
         'ckpt_dir': 'checkpoints/pheme_random5fold',
@@ -81,7 +81,7 @@ PRESETS = {
         'splits': ['loeo', 'chrono'],
         'loeo_events': LOEO_EVENTS,
         'n_epochs': 50,
-        'batch_size': 8,
+        'batch_size': BATCH_SIZE,
         'smoke_n': None,
         'result_csv': 'results/pheme_realistic.csv',
         'ckpt_dir': 'checkpoints/pheme_realistic',
@@ -91,7 +91,7 @@ PRESETS = {
         'splits': ['loeo', 'chrono'],
         'loeo_events': LOEO_EVENTS,
         'n_epochs': 50,
-        'batch_size': 8,
+        'batch_size': BATCH_SIZE,
         'smoke_n': None,
         'result_csv': 'results/pheme_results.csv',
         'ckpt_dir': 'checkpoints/pheme',
@@ -113,6 +113,7 @@ LR_OTHER     = 1e-3
 WEIGHT_DECAY = 5e-5
 PATIENCE     = 10
 NUM_WORKERS  = 4
+BATCH_SIZE   = 16
 
 
 # ---------------------------------------------------------------------------
