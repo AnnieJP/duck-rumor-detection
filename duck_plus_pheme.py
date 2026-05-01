@@ -164,6 +164,11 @@ def main():
     parser.add_argument('--stage', choices=list(PRESETS), default='chrono')
     parser.add_argument('--data-root', default='data')
     parser.add_argument('--gpu', type=int, default=0)
+    # Optional: pin to a single variant/fold for SLURM job arrays
+    parser.add_argument('--variant', choices=['baseline', 'temp', 'gated', 'full'],
+                        default=None, help='Run only this variant (overrides stage)')
+    parser.add_argument('--fold', type=int, default=None,
+                        help='Run only this fold index (overrides stage)')
     args = parser.parse_args()
 
     cfg = PRESETS[args.stage]
@@ -188,6 +193,12 @@ def main():
                     jobs.append((variant, split, fold_idx, None))
             else:
                 jobs.append((variant, split, 0, None))
+
+    # Filter to single variant/fold when called from a SLURM array
+    if args.variant is not None:
+        jobs = [j for j in jobs if j[0] == args.variant]
+    if args.fold is not None:
+        jobs = [j for j in jobs if j[2] == args.fold]
 
     print(f'Total jobs: {len(jobs)}')
 
