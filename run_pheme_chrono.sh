@@ -14,7 +14,7 @@ set -euo pipefail
 #SBATCH --error=logs/pheme_chrono_%A_%a.err
 #SBATCH --array=0-3
 #SBATCH --time=2-00:00:00
-#SBATCH --partition=h100,a30
+#SBATCH --partition=h100
 #SBATCH --gres=gpu:1
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
