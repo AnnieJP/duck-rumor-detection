@@ -1,28 +1,29 @@
-# Juno HPC cluster (CUDA 11.8)
-# Use Miniconda on Juno:
+# Juno HPC cluster (CUDA 12.1 — works on H100 and A30)
+# Setup:
 #   module load miniconda
-#   conda create -n duck python=3.10
-#   conda activate duck
-#   pip install -r requirements-juno.txt
+#   conda create -n duck_venv python=3.10 -y
+#   conda activate duck_venv
+#   TMPDIR=~/tmp_pip pip install --no-cache-dir -r requirements-juno.txt
 #
-# torch-scatter and torch-sparse must match your torch+CUDA version exactly.
-# Check available wheels at: https://data.pyg.org/whl/
+# torch-scatter and torch-sparse must match torch+CUDA exactly.
+# Wheel index: https://data.pyg.org/whl/
 
-torch==2.0.1+cu118
-torchvision==0.15.2+cu118
---extra-index-url https://download.pytorch.org/whl/cu118
+--extra-index-url https://download.pytorch.org/whl/cu121
 
-torch-scatter==2.1.1
-torch-sparse==0.6.17
-torch-geometric==2.3.1
---find-links https://data.pyg.org/whl/torch-2.0.1+cu118.html
+torch==2.5.1+cu121
+torchvision==0.20.1+cu121
 
-transformers==4.2.1
-scikit-learn==0.21.3
-tqdm==4.62.0
-numpy==1.24.3
+--find-links https://data.pyg.org/whl/torch-2.5.1+cu121.html
+torch-scatter==2.1.2
+torch-sparse==0.6.18
+
+torch-geometric==2.6.1
+transformers==4.46.3
+scikit-learn
+tqdm
+numpy<2
 pandas
-matplotlib==3.5.3
-networkx==2.6.3
-scipy==1.7.3
-pyro-ppl==1.8.4
+matplotlib
+networkx
+scipy
+pyro-ppl
