@@ -83,8 +83,10 @@ echo "Task $TASK_ID: variant=$VARIANT split=$SPLIT event=$EVENT fold=$FOLD"
 
 # ── Environment ──────────────────────────────────────────────────────────────
 module load miniconda
-source ~/.bashrc
-conda activate duck
+unset LD_LIBRARY_PATH
+source "$(conda info --base)/etc/profile.d/conda.sh"
+conda activate duck_venv
+nvidia-smi
 
 cd "$WORK_DIR"
 

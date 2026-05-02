@@ -33,8 +33,10 @@ mkdir -p "$SCRATCH_DIR"
 echo "Task $SLURM_ARRAY_TASK_ID: variant=$VARIANT split=chrono"
 
 module load miniconda
-source ~/.bashrc
-conda activate duck
+unset LD_LIBRARY_PATH
+source "$(conda info --base)/etc/profile.d/conda.sh"
+conda activate duck_venv
+nvidia-smi
 
 cd "$WORK_DIR"
 
