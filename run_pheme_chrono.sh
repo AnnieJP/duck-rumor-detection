@@ -10,8 +10,8 @@ set -euo pipefail
 #   tail -f logs/pheme_chrono_<JOB_ID>_<ARRAY_ID>.out
 
 #SBATCH --job-name=pheme_chrono
-#SBATCH --output=logs/pheme_chrono_%A_%a.out
-#SBATCH --error=logs/pheme_chrono_%A_%a.err
+#SBATCH --output=/home/kxr240006/work/duck-rumor-detection/logs/pheme_chrono_%A_%a.out
+#SBATCH --error=/home/kxr240006/work/duck-rumor-detection/logs/pheme_chrono_%A_%a.err
 #SBATCH --array=0-3
 #SBATCH --time=2-00:00:00
 #SBATCH --partition=h100
@@ -20,6 +20,9 @@ set -euo pipefail
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=32G
+
+SLURM_ARRAY_TASK_ID=${SLURM_ARRAY_TASK_ID:-0}
+SLURM_ARRAY_JOB_ID=${SLURM_ARRAY_JOB_ID:-${SLURM_JOB_ID:-$$}}
 
 VARIANTS=(baseline temp gated full)
 VARIANT=${VARIANTS[$SLURM_ARRAY_TASK_ID]}

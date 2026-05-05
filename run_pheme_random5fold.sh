@@ -11,8 +11,8 @@ set -euo pipefail
 #   tail -f logs/pheme_r5f_<JOB_ID>_<ARRAY_ID>.out
 
 #SBATCH --job-name=pheme_r5fold
-#SBATCH --output=logs/pheme_r5f_%A_%a.out
-#SBATCH --error=logs/pheme_r5f_%A_%a.err
+#SBATCH --output=/home/kxr240006/work/duck-rumor-detection/logs/pheme_r5f_%A_%a.out
+#SBATCH --error=/home/kxr240006/work/duck-rumor-detection/logs/pheme_r5f_%A_%a.err
 #SBATCH --array=0-19
 #SBATCH --time=2-00:00:00
 #SBATCH --partition=h100
@@ -24,6 +24,9 @@ set -euo pipefail
 
 # Map array index -> (variant, fold)
 # Layout: variant changes every 5, fold cycles 0-4
+SLURM_ARRAY_TASK_ID=${SLURM_ARRAY_TASK_ID:-0}
+SLURM_ARRAY_JOB_ID=${SLURM_ARRAY_JOB_ID:-${SLURM_JOB_ID:-$$}}
+
 VARIANTS=(baseline temp gated full)
 VARIANT_IDX=$(( SLURM_ARRAY_TASK_ID / 5 ))
 FOLD=$(( SLURM_ARRAY_TASK_ID % 5 ))
