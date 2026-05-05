@@ -7,3 +7,20 @@ dist/
 build/
 .env
 *.log
+
+# Experiment outputs
+checkpoints/
+results/
+
+# Generated preprocessing artifacts
+data/twitter15_npz/
+data/twitter16_npz/
+data/twitter15_5fold/
+data/twitter16_5fold/
+data/twitter15_chrono/
+data/twitter16_chrono/
+data/pheme_npz/
+data/pheme_loeo/
+data/pheme_chrono/
+data/tweet_texts.json
+data/user_features.json

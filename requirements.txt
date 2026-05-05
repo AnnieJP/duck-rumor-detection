@@ -1,14 +1,18 @@
-torch
-torchvision
-torch-scatter
-torch-sparse
-torch-geometric
-transformers
-scikit-learn
-tqdm
-numpy
+# Local development (Mac M1, CPU-only)
+# Install with: pip install -r requirements.txt
+# For PyTorch Geometric extras, see comments below.
+
+torch==2.0.1
+torchvision==0.15.2
+torch-scatter==2.1.1
+torch-sparse==0.6.17
+torch-geometric==2.3.1
+transformers==4.2.1
+scikit-learn==0.21.3
+tqdm==4.62.0
+numpy==1.24.3
 pandas
-matplotlib>=3.6
-networkx>=2.8
-scipy>=1.9
-pyro-ppl>=1.8
+matplotlib==3.5.3
+networkx==2.6.3
+scipy==1.7.3
+pyro-ppl==1.8.4

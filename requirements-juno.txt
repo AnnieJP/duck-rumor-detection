@@ -1,0 +1,29 @@
+# Juno HPC cluster (CUDA 12.1 — works on H100 and A30)
+# Setup:
+#   module load miniconda
+#   conda create -n duck_venv python=3.10 -y
+#   conda activate duck_venv
+#   TMPDIR=~/tmp_pip pip install --no-cache-dir -r requirements-juno.txt
+#
+# torch-scatter and torch-sparse must match torch+CUDA exactly.
+# Wheel index: https://data.pyg.org/whl/
+
+--extra-index-url https://download.pytorch.org/whl/cu121
+
+torch==2.5.1+cu121
+torchvision==0.20.1+cu121
+
+--find-links https://data.pyg.org/whl/torch-2.5.1+cu121.html
+torch-scatter==2.1.2
+torch-sparse==0.6.18
+
+torch-geometric==2.6.1
+transformers==4.46.3
+scikit-learn
+tqdm
+numpy<2
+pandas
+matplotlib
+networkx
+scipy
+pyro-ppl
